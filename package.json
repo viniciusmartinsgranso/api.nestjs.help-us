@@ -37,7 +37,6 @@
     "class-validator": "^0.14.1",
     "emittery": "^1.0.3",
     "envalid": "^8.0.0",
-    "moment-timezone": "^0.5.45",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
