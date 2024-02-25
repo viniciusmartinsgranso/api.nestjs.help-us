@@ -63,6 +63,8 @@ export class UserService {
     user.password = await bcryptjs.hash(payload.password, passwordSalt);
     user.city = payload.city;
 
+    console.log(user)
+
     return await this.repository.save(user)
   }
 }
