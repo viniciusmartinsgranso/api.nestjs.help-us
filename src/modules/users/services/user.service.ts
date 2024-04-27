@@ -1,12 +1,16 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from "../entities/user.entity";
-import { Like, Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { CreateUserPayload } from "../models/create-user.payload";
-import { UserProxy } from "../models/user.proxy";
-import * as bcryptjs from "bcryptjs";
-import { RolesEnum } from "../../../common/enums/roles.enum";
-import { getCleanedString } from "../../../utils/utils/functions";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { UserEntity } from '../entities/user.entity';
+import { Like, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserPayload } from '../models/create-user.payload';
+import { UserProxy } from '../models/user.proxy';
+import * as bcryptjs from 'bcryptjs';
+import { RolesEnum } from '../../../common/enums/roles.enum';
+import { getCleanedString } from '../../../utils/utils/functions';
 
 @Injectable()
 export class UserService {
@@ -19,7 +23,12 @@ export class UserService {
     return this.repository;
   }
 
-  public async getUsers(search: string): Promise<UserEntity[]> {
+  public async getUsers(
+    requestUser: UserEntity,
+    search: string,
+  ): Promise<UserEntity[]> {
+    console.log(requestUser);
+
     return await this.repository.find({
       order: {
         name: 'ASC',
@@ -93,8 +102,6 @@ export class UserService {
   }
 
   public async getMe(requestUser: UserEntity): Promise<UserEntity> {
-    console.log(requestUser, 'REQUESTUSer');
-    return;
     const user = await this.getUserById(requestUser.id);
 
     if (!user)

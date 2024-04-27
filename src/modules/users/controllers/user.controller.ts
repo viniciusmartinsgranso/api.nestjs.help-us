@@ -28,9 +28,12 @@ export class UserController {
     description: 'A busca a ser realizada',
     required: false,
   })
-  public async getUsers(@Query('search') search: string): Promise<UserProxy[]> {
+  public async getUsers(
+    @User() requestUser: UserEntity,
+    @Query('search') search: string,
+  ): Promise<UserProxy[]> {
     return this.userService
-      .getUsers(search)
+      .getUsers(requestUser, search)
       .then((result) => result.map((entity) => new UserProxy(entity)));
   }
 
@@ -48,7 +51,7 @@ export class UserController {
   }
 
   @ProtectTo()
-  @Get('/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtém os dados de um usuário' })
   @ApiOkResponse({ type: UserProxy })
   public async getUserById(@Param('id') id: number): Promise<UserProxy> {
@@ -56,13 +59,10 @@ export class UserController {
   }
 
   @ProtectTo()
-  @Get('/me')
+  @Get('me')
   @ApiOperation({ summary: 'Retorna as informações do usuário logado' })
   @ApiOkResponse({ type: UserProxy })
   public async getMe(@User() requestUser: UserEntity): Promise<UserProxy> {
-    console.log(requestUser);
-    return this.userService
-      .getMe(requestUser)
-      .then((entity) => new UserProxy(entity));
+    return this.userService.getMe(requestUser);
   }
 }
