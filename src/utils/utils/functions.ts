@@ -1,3 +1,5 @@
+import { filterXSS } from "xss";
+
 export function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined;
 }
@@ -86,4 +88,8 @@ export function listEnumValues<T extends object>(
   enumObject: T,
 ): Array<T[keyof T]> {
   return Object.keys(enumObject).map((key) => enumObject[key]);
+}
+
+export function getCleanedString(value: string): string {
+  return filterXSS(value.trim().toLowerCase());
 }
