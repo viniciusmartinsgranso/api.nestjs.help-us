@@ -4,6 +4,7 @@ import { UserModule } from './modules/users/user.module';
 import { environment } from './environment/environment';
 import { AuthModule } from './modules/auth/auth.module';
 import { join } from 'path';
+import { OccurrencesModule } from './modules/occurrences/occurrences.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { join } from 'path';
     }),
     AuthModule,
     UserModule,
+    OccurrencesModule,
   ],
   controllers: [],
   providers: [],

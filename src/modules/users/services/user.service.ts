@@ -27,8 +27,6 @@ export class UserService {
     requestUser: UserEntity,
     search: string,
   ): Promise<UserEntity[]> {
-    console.log(requestUser);
-
     return await this.repository.find({
       order: {
         name: 'ASC',

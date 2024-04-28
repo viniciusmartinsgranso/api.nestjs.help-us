@@ -1,11 +1,12 @@
 import {
   Column,
   CreateDateColumn,
-  Entity,
+  Entity, OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 import { RolesEnum } from '../../../common/enums/roles.enum';
+import { OccurrenceEntity } from "../../occurrences/entities/occurrence.entity";
 
 @Entity('user')
 export class UserEntity {
@@ -35,4 +36,7 @@ export class UserEntity {
 
   @Column({ nullable: false, type: 'simple-array' })
   public roles!: RolesEnum[];
+
+  @OneToMany(() => OccurrenceEntity, (occurrence) => occurrence.user)
+  occurrences: OccurrenceEntity[];
 }

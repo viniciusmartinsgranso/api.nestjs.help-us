@@ -45,17 +45,7 @@ export class UserController {
     description: 'Os dados a serem cadastrados no usuário',
   })
   public async createUser(@Body() user: CreateUserPayload): Promise<UserProxy> {
-    return this.userService
-      .createUser(user)
-      .then((entity) => new UserProxy(entity));
-  }
-
-  @ProtectTo()
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtém os dados de um usuário' })
-  @ApiOkResponse({ type: UserProxy })
-  public async getUserById(@Param('id') id: number): Promise<UserProxy> {
-    return this.userService.getUserById(id);
+    return this.userService.createUser(user);
   }
 
   @ProtectTo()
@@ -65,4 +55,13 @@ export class UserController {
   public async getMe(@User() requestUser: UserEntity): Promise<UserProxy> {
     return this.userService.getMe(requestUser);
   }
+
+  @ProtectTo()
+  @Get('one/:id')
+  @ApiOperation({ summary: 'Obtém os dados de um usuário' })
+  @ApiOkResponse({ type: UserProxy })
+  public async getUserById(@Param('id') id: number): Promise<UserProxy> {
+    return this.userService.getUserById(id);
+  }
+
 }

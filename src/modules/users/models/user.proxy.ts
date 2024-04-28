@@ -1,7 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserEntity } from '../entities/user.entity';
 import { GetManyDefaultResponseProxy } from '../../../common/proxies/get-many-default-response.proxy';
 import { RolesEnum } from '../../../common/enums/roles.enum';
+import { OccurrenceProxy } from "../../occurrences/models/occurrence.proxy";
 
 export class UserProxy {
   constructor(entity: UserEntity) {
@@ -30,7 +31,7 @@ export class UserProxy {
   @ApiProperty({ type: String })
   public name!: string;
 
-  @ApiProperty({ type: String })
+  @ApiProperty({ type: String, example: 'vini.martins@email.com' })
   public email!: string;
 
   @ApiProperty({ type: String })
@@ -41,6 +42,9 @@ export class UserProxy {
 
   @ApiProperty()
   public roles: RolesEnum[];
+
+  @ApiPropertyOptional({ isArray: true })
+  public occurrences?: OccurrenceProxy[];
 }
 
 export class GetManyDefaultResponseUserProxy extends GetManyDefaultResponseProxy {
