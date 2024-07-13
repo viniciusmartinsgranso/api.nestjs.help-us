@@ -5,18 +5,23 @@ import {
   Body,
   Patch,
   Param,
-  Delete, Query
-} from "@nestjs/common";
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { OccurrencesService } from '../services/occurrences.service';
 import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
 import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
-import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from '../../../decorators/user/user.decorator';
 import { UserEntity } from '../../users/entities/user.entity';
 import { OccurrenceEntity } from '../entities/occurrence.entity';
 import { ProtectTo } from '../../../decorators/protect/protect.decorator';
-import { OccurrenceProxy } from "../models/occurrence.proxy";
-import { UserProxy } from "../../users/models/user.proxy";
+import { OccurrenceProxy } from '../models/occurrence.proxy';
 
 @ApiTags('Occurrences')
 @Controller('occurrences')
@@ -47,17 +52,33 @@ export class OccurrencesController {
     @User() requestUser: UserEntity,
     @Query('search') search: string,
   ): Promise<OccurrenceProxy[]> {
-    return this.occurrencesService
-      .findAll(requestUser, search)
-      .then((result) => result.map((entity) => new OccurrenceProxy(entity)));
+    return this.occurrencesService.findAll(requestUser, search).then((result) =>
+      result.map((entity) => {
+        entity.latitude = +entity.latitude;
+        entity.longitude = +entity.longitude;
+        return new OccurrenceProxy(entity);
+      }),
+    );
   }
 
   @ProtectTo()
   @Get('one/:id')
-  @ApiOperation({ summary: 'Obtém os dados de um usuário' })
+  @ApiOperation({ summary: 'Obtém os dados de uma ocorrência' })
   @ApiOkResponse({ type: OccurrenceProxy })
   public async findOne(@Param('id') id: number): Promise<OccurrenceProxy> {
     return this.occurrencesService.findOne(id);
+  }
+
+  @ProtectTo()
+  @Get('me')
+  @ApiOperation({ summary: 'Obtém as ocorrencias do usupario' })
+  @ApiOkResponse({ type: OccurrenceProxy, isArray: true })
+  public async findByUser(
+    @User() requestUser: UserEntity,
+  ): Promise<OccurrenceProxy[]> {
+    return await this.occurrencesService
+      .getUserOccurrences(requestUser)
+      .then((result) => result.map((entity) => new OccurrenceProxy(entity)));
   }
 
   @Patch(':id')

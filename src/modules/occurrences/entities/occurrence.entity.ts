@@ -26,19 +26,25 @@ export class OccurrenceEntity {
   public isActive: boolean;
 
   @Column({ nullable: false, length: 128 })
-  title!: string;
+  title: string;
 
   @Column({ nullable: false, length: 256 })
-  description!: string;
+  description: string;
 
   @Column({ nullable: false, length: 128 })
-  location!: string;
+  location: string;
 
-  @Column({ nullable: false, type: 'simple-array' })
-  public type!: OccurrenceTypeEnum;
+  @Column({ nullable: false, type: 'decimal' })
+  latitude: number;
+
+  @Column({ nullable: false, type: 'decimal' })
+  longitude: number;
+
+  @Column({ nullable: false, enum: OccurrenceTypeEnum })
+  public type: OccurrenceTypeEnum;
 
   @Column({ nullable: false })
-  userId!: number;
+  userId: number;
 
   @Column({ nullable: true })
   photoUrl?: string;

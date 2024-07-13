@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
 import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OccurrenceEntity } from '../entities/occurrence.entity';
-import { Like, Repository } from "typeorm";
+import { Like, Repository } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
@@ -21,14 +21,10 @@ export class OccurrencesService {
     requestUser: UserEntity,
     createOccurrenceDto: CreateOccurrencePayload,
   ): Promise<OccurrenceEntity> {
-    const occurrence = new OccurrenceEntity();
-
-    occurrence.userId = requestUser.id;
-    occurrence.title = createOccurrenceDto.title;
-    occurrence.description = createOccurrenceDto.description;
-    occurrence.type = createOccurrenceDto.type;
-    occurrence.location = createOccurrenceDto.location;
-    occurrence.photoUrl = createOccurrenceDto.photoUrl;
+    const occurrence = this.repository.create({
+      ...createOccurrenceDto,
+      userId: requestUser.id,
+    });
 
     return await this.repository.save(occurrence);
   }
@@ -63,5 +59,13 @@ export class OccurrencesService {
 
   public async remove(id: number) {
     return `This action removes a #${id} occurrence`;
+  }
+
+  public async getUserOccurrences(
+    requestUser: UserEntity,
+  ): Promise<OccurrenceEntity[]> {
+    return await this.repository.findBy({
+      userId: requestUser.id
+    });
   }
 }

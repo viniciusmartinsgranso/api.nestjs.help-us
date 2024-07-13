@@ -2,7 +2,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { environment } from '../environment/environment';
 import { join } from 'path';
 
-const config: DataSourceOptions = {
+export const config: DataSourceOptions = {
   type: 'postgres',
   //remover se for usado docker
   url: environment.DATABASE_URL,

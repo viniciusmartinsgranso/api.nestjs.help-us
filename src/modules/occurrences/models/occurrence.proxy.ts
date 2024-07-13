@@ -13,6 +13,8 @@ export class OccurrenceProxy {
     this.description = entity.description;
     this.type = entity.type;
     this.location = entity.location;
+    this.latitude = entity.latitude;
+    this.longitude = entity.longitude;
     this.userId = entity.userId;
     this.photoUrl = entity.photoUrl;
   }
@@ -37,6 +39,12 @@ export class OccurrenceProxy {
 
   @ApiProperty({ nullable: false })
   public location: string;
+
+  @ApiProperty({ nullable: false, type: Number })
+  public longitude: number;
+
+  @ApiProperty({ nullable: false, type: Number })
+  public latitude: number;
 
   @ApiProperty({ enum: OccurrenceTypeEnum, nullable: false })
   public type: OccurrenceTypeEnum;
