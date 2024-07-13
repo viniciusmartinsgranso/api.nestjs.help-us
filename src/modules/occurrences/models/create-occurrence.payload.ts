@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDefined,
-  IsEnum,
+  IsEnum, IsNumber,
   IsOptional,
   IsString,
-  MaxLength,
-} from 'class-validator';
+  MaxLength
+} from "class-validator";
 import { DefaultValidationMessages } from '../../../common/validations/default-validation-messages';
 import { OccurrenceTypeEnum } from '../../users/models/occurrence-type.enum';
 
@@ -36,6 +36,16 @@ export class CreateOccurrencePayload {
     message: 'A localização não pode ter mais que 256 caracteres.',
   })
   public location!: string;
+
+  @ApiProperty()
+  @IsDefined({ message: 'É necessário informar a latitude.' })
+  @IsNumber({ allowInfinity: true })
+  public latitude!: number;
+
+  @ApiProperty()
+  @IsDefined({ message: 'É necessário informar a longitude.' })
+  @IsNumber({ allowInfinity: true })
+  public longitude!: number;
 
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()

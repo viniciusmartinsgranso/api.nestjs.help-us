@@ -10,7 +10,6 @@ import {
 import { UserProxy } from '../models/user.proxy';
 import { ProtectTo } from '../../../decorators/protect/protect.decorator';
 import { CreateUserPayload } from '../models/create-user.payload';
-import { RolesEnum } from '../../../common/enums/roles.enum';
 import { User } from '../../../decorators/user/user.decorator';
 import { UserEntity } from '../entities/user.entity';
 

@@ -11,25 +11,26 @@ import { OccurrencesModule } from './modules/occurrences/occurrences.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       //remover se for usado docker
-      url: environment.DATABASE_URL,
+      // url: environment.DATABASE_URL,
+      // host: environment.HOST,
+      // username: 'default',
+      // password: environment.PASSWORD,
+      // autoLoadEntities: false,
       //
       //Usar Docker
-      // host: 'localhost',
-      // port: 5432,
-      // username: 'postgres',
-      // password: '1234',
-      // database: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: '1234',
+      database: 'postgres',
       //
       entities: [
         join(__dirname, '../../../../modules', '**', '*.entity.{ts,js}'),
       ],
       migrations: [join(__dirname, 'dist/migrations', '*.ts')],
-      synchronize: false,
-      ssl: true,
+      synchronize: true,
+      autoLoadEntities: true,
       logging: environment.DATABASE_LOGGING === 'true',
-      host: environment.HOST,
-      username: 'default',
-      password: environment.PASSWORD,
     }),
     AuthModule,
     UserModule,
