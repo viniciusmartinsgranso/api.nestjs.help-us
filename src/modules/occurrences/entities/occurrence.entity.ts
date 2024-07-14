@@ -34,10 +34,10 @@ export class OccurrenceEntity {
   @Column({ nullable: false, length: 128 })
   location: string;
 
-  @Column({ nullable: false, type: 'decimal' })
+  @Column({ nullable: false, type: 'float' })
   latitude: number;
 
-  @Column({ nullable: false, type: 'decimal' })
+  @Column({ nullable: false, type: 'float' })
   longitude: number;
 
   @Column({ nullable: false, enum: OccurrenceTypeEnum })

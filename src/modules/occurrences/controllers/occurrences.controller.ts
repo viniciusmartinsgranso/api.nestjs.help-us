@@ -50,9 +50,13 @@ export class OccurrencesController {
   })
   public async findAll(
     @User() requestUser: UserEntity,
+    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: number,
     @Query('search') search: string,
   ): Promise<OccurrenceProxy[]> {
-    return this.occurrencesService.findAll(requestUser, search).then((result) =>
+    return this.occurrencesService
+      .findAll(requestUser, latitude, longitude, search)
+      .then((result) =>
       result.map((entity) => {
         entity.latitude = +entity.latitude;
         entity.longitude = +entity.longitude;
