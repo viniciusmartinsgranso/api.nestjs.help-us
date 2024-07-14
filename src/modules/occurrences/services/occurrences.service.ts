@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
-import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
-import { InjectRepository } from '@nestjs/typeorm';
-import { OccurrenceEntity } from '../entities/occurrence.entity';
-import { Like, Repository } from 'typeorm';
-import { UserEntity } from '../../users/entities/user.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateOccurrencePayload } from "../models/create-occurrence.payload";
+import { UpdateOccurrencePayload } from "../models/update-occurrence.payload";
+import { InjectRepository } from "@nestjs/typeorm";
+import { OccurrenceEntity } from "../entities/occurrence.entity";
+import { Repository } from "typeorm";
+import { UserEntity } from "../../users/entities/user.entity";
 
 @Injectable()
 export class OccurrencesService {
@@ -31,14 +31,29 @@ export class OccurrencesService {
 
   public async findAll(
     requestUser: UserEntity,
-    search: string,
+    latitude: number,
+    longitude: number,
+    search?: string,
   ): Promise<OccurrenceEntity[]> {
-    return await this.repository.find({
-      order: {
-        title: 'ASC',
-      },
-      where: search ? { title: Like('%' + search + '%') } : {},
-    });
+    const radius = 5 * 1000; // 12 km in meters
+
+    const query = this.repository
+      .createQueryBuilder('occurrence')
+      .where(
+        `ST_DistanceSphere(
+          ST_MakePoint(:userLongitude, :userLatitude),
+          ST_MakePoint(occurrence.longitude, occurrence.latitude)
+        ) <= :radius`,
+        { userLongitude: longitude, userLatitude: latitude, radius },
+      );
+
+    if (search) {
+      query.andWhere('occurrence.title LIKE :search', { search: `%${search}%` });
+    }
+
+    query.orderBy('occurrence.title', 'ASC');
+
+    return await query.getMany();
   }
 
   public async findOne(id: number): Promise<OccurrenceEntity> {
@@ -65,7 +80,31 @@ export class OccurrencesService {
     requestUser: UserEntity,
   ): Promise<OccurrenceEntity[]> {
     return await this.repository.findBy({
-      userId: requestUser.id
+      userId: requestUser.id,
     });
+  }
+
+  private calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
+    const R = 6371; // Raio da Terra em km
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) *
+        Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    // Distância em km
+    return R * c;
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
   }
 }
