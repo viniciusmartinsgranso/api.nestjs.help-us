@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateOccurrencePayload } from "../models/create-occurrence.payload";
-import { UpdateOccurrencePayload } from "../models/update-occurrence.payload";
-import { InjectRepository } from "@nestjs/typeorm";
-import { OccurrenceEntity } from "../entities/occurrence.entity";
-import { Repository } from "typeorm";
-import { UserEntity } from "../../users/entities/user.entity";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
+import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OccurrenceEntity } from '../entities/occurrence.entity';
+import { Like, Repository } from 'typeorm';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
 export class OccurrencesService {
@@ -37,23 +37,34 @@ export class OccurrencesService {
   ): Promise<OccurrenceEntity[]> {
     const radius = 5 * 1000; // 12 km in meters
 
-    const query = this.repository
-      .createQueryBuilder('occurrence')
-      .where(
-        `ST_DistanceSphere(
-          ST_MakePoint(:userLongitude, :userLatitude),
-          ST_MakePoint(occurrence.longitude, occurrence.latitude)
-        ) <= :radius`,
-        { userLongitude: longitude, userLatitude: latitude, radius },
-      );
+    const occurrences = await this.repository.find({
+      where: search ? { title: Like(`%${search}%`) } : {},
+      order: {
+        createdAt: 'ASC',
+      },
+    });
 
-    if (search) {
-      query.andWhere('occurrence.title LIKE :search', { search: `%${search}%` });
+    const filteredOccurrences = occurrences.filter((occurrence) => {
+      const distance = this.calculateDistance(
+        latitude,
+        longitude,
+        occurrence.latitude,
+        occurrence.longitude,
+      );
+      return distance <= radius;
+    });
+
+    const currentDate = new Date();
+    for (const occurrence of filteredOccurrences) {
+      const timeDifference =
+        currentDate.getTime() - occurrence.updatedAt.getTime();
+      if (timeDifference > 10800000) {
+        occurrence.isActive = false;
+        await this.repository.save(occurrence);
+      }
     }
 
-    query.orderBy('occurrence.title', 'ASC');
-
-    return await query.getMany();
+    return filteredOccurrences;
   }
 
   public async findOne(id: number): Promise<OccurrenceEntity> {
@@ -83,4 +94,34 @@ export class OccurrencesService {
       userId: requestUser.id,
     });
   }
+
+  //#endregion
+
+  //#region Private Methods
+
+  private calculateDistance(
+    latitude1: number,
+    longitude1: number,
+    latitude2: number,
+    longitude2: number,
+  ): number {
+    const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+    const earthRadius = 6371e3;
+    const phi1 = toRadians(latitude1);
+    const phi2 = toRadians(latitude2);
+    const deltaPhi = toRadians(latitude2 - latitude1);
+    const deltaLambda = toRadians(longitude2 - longitude1);
+
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) *
+        Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) *
+        Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  //#endergion
 }

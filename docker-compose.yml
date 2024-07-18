@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   db:
-    image: postgis/postgis:13-3.1-alpine
+    image: postgres
     container_name: postgres-help-us
     ports:
       - "5432:5432"

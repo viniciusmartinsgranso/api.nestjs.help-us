@@ -5,23 +5,25 @@ import { environment } from './environment/environment';
 import { AuthModule } from './modules/auth/auth.module';
 import { join } from 'path';
 import { OccurrencesModule } from './modules/occurrences/occurrences.module';
+import { MediasModule } from './modules/medias/medias.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
       //remover se for usado docker
-      // url: environment.DATABASE_URL,
-      // host: environment.HOST,
-      // username: 'default',
-      // password: environment.PASSWORD,
-      // autoLoadEntities: false,
+      url: environment.DATABASE_URL,
+      host: environment.HOST,
+      username: 'default',
+      password: environment.DATABASE_PASSWORD,
+      autoLoadEntities: true,
+      ssl: true,
       //
       //Usar Docker
-      host: 'localhost',
+      // host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: '1234',
+      // username: 'postgres',
+      // password: '1234',
       database: 'postgres',
       //
       entities: [
@@ -29,12 +31,13 @@ import { OccurrencesModule } from './modules/occurrences/occurrences.module';
       ],
       migrations: [join(__dirname, 'dist/migrations', '*.ts')],
       synchronize: true,
-      autoLoadEntities: true,
+      // autoLoadEntities: true,
       logging: environment.DATABASE_LOGGING === 'true',
     }),
     AuthModule,
     UserModule,
     OccurrencesModule,
+    MediasModule,
   ],
   controllers: [],
   providers: [],
