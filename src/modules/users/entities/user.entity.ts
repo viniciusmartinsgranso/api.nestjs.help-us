@@ -22,13 +22,13 @@ export class UserEntity {
   @Column({ nullable: false, default: true })
   public isActive: boolean;
 
-  @Column({ nullable: false, length: 128, unique: true })
+  @Column({ nullable: false, length: 128 })
   public name!: string;
 
   @Column({ nullable: false, length: 128, unique: true })
   public email!: string;
 
-  @Column({ nullable: false, length: 128, unique: true })
+  @Column({ nullable: false, length: 128 })
   public city!: string;
 
   @Column({ nullable: false, length: 60 })
