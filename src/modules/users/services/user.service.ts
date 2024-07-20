@@ -109,4 +109,12 @@ export class UserService {
 
     return user;
   }
+
+  public async delete(id: number): Promise<UserEntity> {
+    const entity = await this.repository.findOneBy({ id });
+
+    if (!entity) throw new NotFoundException();
+
+    return this.repository.remove(entity);
+  }
 }
