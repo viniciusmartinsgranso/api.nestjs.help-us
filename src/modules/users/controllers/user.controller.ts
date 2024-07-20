@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, Delete } from "@nestjs/common";
 import { UserService } from '../services/user.service';
 import {
   ApiBody,
@@ -12,6 +12,7 @@ import { ProtectTo } from '../../../decorators/protect/protect.decorator';
 import { CreateUserPayload } from '../models/create-user.payload';
 import { User } from '../../../decorators/user/user.decorator';
 import { UserEntity } from '../entities/user.entity';
+import { RolesEnum } from "../../../common/enums/roles.enum";
 
 @ApiTags('Users')
 @Controller('users')
@@ -61,6 +62,12 @@ export class UserController {
   @ApiOkResponse({ type: UserProxy })
   public async getUserById(@Param('id') id: number): Promise<UserProxy> {
     return this.userService.getUserById(id);
+  }
+
+  @ProtectTo()
+  @Delete(':id')
+  public async delete(@Param('id') id: number): Promise<UserProxy> {
+    return await this.userService.delete(id);
   }
 
 }

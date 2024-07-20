@@ -49,4 +49,14 @@ export class AuthService {
   public async validateJwt(payload: JwtPayload): Promise<UserEntity> {
     return await this.userService.getUserById(payload.id);
   }
+
+  public async generateInvitedToken(): Promise<TokenProxy> {
+    const payload: JwtPayload = {
+      id: 5,
+    };
+
+    const token = await this.jwtService.signAsync(payload, { expiresIn: '1d' });
+
+    return new TokenProxy(token);
+  }
 }

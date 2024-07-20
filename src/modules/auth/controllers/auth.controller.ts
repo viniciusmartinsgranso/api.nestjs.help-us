@@ -24,4 +24,9 @@ export class AuthController {
     return await this.service.generateToken(requestUser);
   }
 
+  @Post('invited')
+  public async invited(): Promise<TokenProxy> {
+    return await this.service.generateInvitedToken();
+  }
+
 }
