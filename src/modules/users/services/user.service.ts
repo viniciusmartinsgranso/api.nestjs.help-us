@@ -1,23 +1,24 @@
 import {
   ForbiddenException,
   Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { UserEntity } from '../entities/user.entity';
-import { Like, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserPayload } from '../models/create-user.payload';
-import { UserProxy } from '../models/user.proxy';
-import * as bcryptjs from 'bcryptjs';
-import { RolesEnum } from '../../../common/enums/roles.enum';
-import { getCleanedString } from '../../../utils/utils/functions';
+  NotFoundException
+} from "@nestjs/common";
+import { UserEntity } from "../entities/user.entity";
+import { Like, Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { CreateUserPayload } from "../models/create-user.payload";
+import { UserProxy } from "../models/user.proxy";
+import * as bcryptjs from "bcryptjs";
+import { RolesEnum } from "../../../common/enums/roles.enum";
+import { getCleanedString } from "../../../utils/utils/functions";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly repository: Repository<UserEntity>,
-  ) {}
+    private readonly repository: Repository<UserEntity>
+  ) {
+  }
 
   public getRepository(): Repository<UserEntity> {
     return this.repository;
@@ -25,20 +26,26 @@ export class UserService {
 
   public async getUsers(
     requestUser: UserEntity,
-    search: string,
+    search: string
   ): Promise<UserEntity[]> {
     return await this.repository.find({
       order: {
-        name: 'ASC',
+        name: "ASC"
       },
-      where: search ? { name: Like('%' + search + '%') } : {},
+      where: search ? { name: Like("%" + search + "%") } : {}
     });
   }
 
-  public async getUserById(userId: number): Promise<UserEntity> {
-    const user = await this.repository.findOneBy({ id: userId });
+  public async getUserById(
+    userId: number,
+    occurrences?: boolean,
+  ): Promise<UserEntity> {
+    const user = await this.repository.findOne({
+      where: { id: userId },
+      relations: occurrences ? ['occurrences'] : [],
+    });
 
-    if (!user) throw new NotFoundException('O usuário não foi encontrado');
+    if (!user) throw new NotFoundException("O usuário não foi encontrado");
     delete user.password;
 
     return user;
@@ -46,16 +53,16 @@ export class UserService {
 
   public async getUserByEmail(
     email: string,
-    validateIsActive: boolean = true,
+    validateIsActive: boolean = true
   ): Promise<UserEntity> {
     const user = await this.repository
-      .createQueryBuilder('user')
-      .where('user.email = :email', { email })
+      .createQueryBuilder("user")
+      .where("user.email = :email", { email })
       .getOne();
 
     if (!user || (!user.isActive && validateIsActive))
       throw new NotFoundException(
-        'O usuário com essa identificação não foi encontrado ou está desativado.',
+        "O usuário com essa identificação não foi encontrado ou está desativado."
       );
 
     return user;
@@ -63,10 +70,10 @@ export class UserService {
 
   public async createUser(payload: CreateUserPayload): Promise<UserProxy> {
     const haveUser = await this.repository.findOneBy({
-      email: payload.email,
+      email: payload.email
     });
 
-    if (haveUser) throw new ForbiddenException('Oops...', 'Ocorreu um erro.');
+    if (haveUser) throw new ForbiddenException("Oops...", "Ocorreu um erro.");
 
     const user = new UserEntity();
     const passwordSalt = await bcryptjs.genSalt();
@@ -82,29 +89,32 @@ export class UserService {
 
   public async findByUsername(
     username: string,
-    validateIsActive = true,
+    validateIsActive = true
   ): Promise<UserEntity> {
     username = getCleanedString(username);
 
     const user = await this.repository
-      .createQueryBuilder('user')
-      .where('user.username = :username', { username })
+      .createQueryBuilder("user")
+      .where("user.username = :username", { username })
       .getOne();
 
     if (!user || (!user.isActive && validateIsActive))
       throw new NotFoundException(
-        'O usuário com essa identificação não foi encontrado ou está desativado.',
+        "O usuário com essa identificação não foi encontrado ou está desativado."
       );
 
     return user;
   }
 
-  public async getMe(requestUser: UserEntity): Promise<UserEntity> {
-    const user = await this.getUserById(requestUser.id);
+  public async getMe(
+    requestUser: UserEntity,
+    occurrences?: boolean,
+  ): Promise<UserEntity> {
+    const user = await this.getUserById(requestUser.id, occurrences);
 
     if (!user)
       throw new NotFoundException(
-        'O usuário com essa identificação não foi encontrado ou está desativado.',
+        "O usuário com essa identificação não foi encontrado ou está desativado."
       );
 
     return user;

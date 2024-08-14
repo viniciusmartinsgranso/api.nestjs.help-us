@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Query, Param, Delete } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import {
   ApiBody,
@@ -12,7 +20,7 @@ import { ProtectTo } from '../../../decorators/protect/protect.decorator';
 import { CreateUserPayload } from '../models/create-user.payload';
 import { User } from '../../../decorators/user/user.decorator';
 import { UserEntity } from '../entities/user.entity';
-import { RolesEnum } from "../../../common/enums/roles.enum";
+import { RolesEnum } from '../../../common/enums/roles.enum';
 
 @ApiTags('Users')
 @Controller('users')
@@ -52,8 +60,11 @@ export class UserController {
   @Get('me')
   @ApiOperation({ summary: 'Retorna as informações do usuário logado' })
   @ApiOkResponse({ type: UserProxy })
-  public async getMe(@User() requestUser: UserEntity): Promise<UserProxy> {
-    return this.userService.getMe(requestUser);
+  public async getMe(
+    @User() requestUser: UserEntity,
+    @Query('occurrences') occurrences: boolean,
+  ): Promise<UserProxy> {
+    return this.userService.getMe(requestUser, occurrences);
   }
 
   @ProtectTo()
@@ -69,5 +80,4 @@ export class UserController {
   public async delete(@Param('id') id: number): Promise<UserProxy> {
     return await this.userService.delete(id);
   }
-
 }
