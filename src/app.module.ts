@@ -11,7 +11,7 @@ import { MediasModule } from './modules/medias/medias.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      //remover se for usado docker
+      // remover se for usado docker
       url: environment.DATABASE_URL,
       host: environment.HOST,
       username: 'default',
@@ -21,10 +21,10 @@ import { MediasModule } from './modules/medias/medias.module';
       //
       //Usar Docker
       // host: 'localhost',
-      port: 5432,
+      // port: 5432,
       // username: 'postgres',
       // password: '1234',
-      database: 'postgres',
+      // database: 'postgres',
       //
       entities: [
         join(__dirname, '../../../../modules', '**', '*.entity.{ts,js}'),

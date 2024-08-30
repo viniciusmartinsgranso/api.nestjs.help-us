@@ -22,6 +22,7 @@ import { UserEntity } from '../../users/entities/user.entity';
 import { OccurrenceEntity } from '../entities/occurrence.entity';
 import { ProtectTo } from '../../../decorators/protect/protect.decorator';
 import { OccurrenceProxy } from '../models/occurrence.proxy';
+import { RolesEnum } from "../../../common/enums/roles.enum";
 
 @ApiTags('Occurrences')
 @Controller('occurrences')
@@ -31,7 +32,7 @@ export class OccurrencesController {
   @Post()
   @ApiOperation({ summary: 'Cria uma nova ocorrência' })
   @ApiOkResponse()
-  @ProtectTo()
+  @ProtectTo(RolesEnum.USER, RolesEnum.ADMIN)
   create(
     @User() requestUser: UserEntity,
     @Body() createOccurrenceDto: CreateOccurrencePayload,
@@ -58,7 +59,7 @@ export class OccurrencesController {
       .findAll(requestUser, latitude, longitude, search)
       .then((result) =>
       result.map((entity) => {
-        entity.latitude = +entity.latitude;
+          entity.latitude = +entity.latitude;
         entity.longitude = +entity.longitude;
         return new OccurrenceProxy(entity);
       }),

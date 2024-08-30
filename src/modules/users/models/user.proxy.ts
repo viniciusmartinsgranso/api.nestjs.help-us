@@ -40,8 +40,8 @@ export class UserProxy {
   @ApiProperty({ type: String })
   public password!: string;
 
-  @ApiProperty()
-  public roles: RolesEnum[];
+  @ApiProperty({ enum: RolesEnum })
+  public roles: RolesEnum;
 
   @ApiPropertyOptional({ isArray: true })
   public occurrences?: OccurrenceProxy[];

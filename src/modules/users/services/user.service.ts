@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException
-} from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { UserEntity } from "../entities/user.entity";
 import { Like, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -81,7 +77,18 @@ export class UserService {
     user.name = payload.name;
     user.email = payload.email;
     user.city = payload.city;
-    user.roles = !payload.roles ? [RolesEnum.USER] : [RolesEnum.ADMIN];
+
+    switch (payload.roles) {
+      case RolesEnum.ADMIN:
+        user.roles = RolesEnum.ADMIN;
+        break;
+      case RolesEnum.NONE:
+        user.roles = RolesEnum.NONE
+        break;
+      default:
+        user.roles = RolesEnum.USER;
+    }
+
     user.password = await bcryptjs.hash(payload.password, passwordSalt);
 
     return await this.repository.save(user);

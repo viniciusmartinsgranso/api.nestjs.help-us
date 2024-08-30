@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
-import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
-import { InjectRepository } from '@nestjs/typeorm';
-import { OccurrenceEntity } from '../entities/occurrence.entity';
-import { Like, Repository } from 'typeorm';
-import { UserEntity } from '../../users/entities/user.entity';
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { CreateOccurrencePayload } from "../models/create-occurrence.payload";
+import { UpdateOccurrencePayload } from "../models/update-occurrence.payload";
+import { InjectRepository } from "@nestjs/typeorm";
+import { OccurrenceEntity } from "../entities/occurrence.entity";
+import { Like, Repository } from "typeorm";
+import { UserEntity } from "../../users/entities/user.entity";
+import { RolesEnum } from "../../../common/enums/roles.enum";
 
 @Injectable()
 export class OccurrencesService {
@@ -21,6 +22,9 @@ export class OccurrencesService {
     requestUser: UserEntity,
     createOccurrenceDto: CreateOccurrencePayload,
   ): Promise<OccurrenceEntity> {
+    if (requestUser.roles === RolesEnum.NONE)
+      throw new ForbiddenException("Usuário não possui permissão para criar uma ocorrência.");
+
     const occurrence = this.repository.create({
       ...createOccurrenceDto,
       userId: requestUser.id,
@@ -38,7 +42,12 @@ export class OccurrencesService {
     const radius = 50 * 1000; // 12 km in meters
 
     const occurrences = await this.repository.find({
-      where: search ? { title: Like(`%${search}%`) } : {},
+      where: {
+        ...(search && {
+          title: Like(`%${search}%`)
+        }),
+        isActive: true,
+      },
       order: {
         createdAt: 'ASC',
       },

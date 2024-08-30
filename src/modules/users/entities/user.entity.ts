@@ -34,8 +34,8 @@ export class UserEntity {
   @Column({ nullable: false, length: 60 })
   public password!: string;
 
-  @Column({ nullable: false, type: 'simple-array' })
-  public roles!: RolesEnum[];
+  @Column({ nullable: false })
+  public roles!: RolesEnum;
 
   @OneToMany(() => OccurrenceEntity, (occurrence) => occurrence.user)
   occurrences: OccurrenceEntity[];

@@ -39,5 +39,5 @@ export class CreateUserPayload {
 
   @ApiProperty({ default: RolesEnum.USER })
   @IsOptional()
-  public roles: RolesEnum[];
+  public roles: RolesEnum;
 }
