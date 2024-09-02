@@ -22,7 +22,7 @@ export class OccurrencesService {
     requestUser: UserEntity,
     createOccurrenceDto: CreateOccurrencePayload,
   ): Promise<OccurrenceEntity> {
-    if (requestUser.roles === RolesEnum.NONE)
+    if (requestUser.roles.includes(RolesEnum.NONE))
       throw new ForbiddenException("Usuário não possui permissão para criar uma ocorrência.");
 
     const occurrence = this.repository.create({
