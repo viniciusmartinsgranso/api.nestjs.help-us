@@ -1,20 +1,18 @@
-import { DataSource, DataSourceOptions } from "typeorm";
-import { environment } from "../environment/environment";
-import { join } from "path";
+import { DataSource } from 'typeorm';
+import { join } from 'path';
+import { environment } from 'src/environment/environment';
 
-export const config: DataSourceOptions = {
+const appDataSource: DataSource = new DataSource({
   type: 'postgres',
   url: environment.DATABASE_URL,
-  entities: [join(__dirname, '../modules', '**', '*.entity.{ts,js}')],
-  migrations: [join(__dirname, '../migrations', '*.ts')],
-  synchronize: false, // Recomenda-se desativar o synchronize em produção
-  ssl: true,
-  logging: environment.DATABASE_LOGGING === 'true',
   host: environment.HOST,
-  username: environment.DATABASE_USERNAME,
+  username: 'default',
   password: environment.DATABASE_PASSWORD,
-  database: 'postgres',
-  port: 5432,
-};
+  ssl: true,
+  entities: [join(__dirname, 'src/modules/**', '*.entity.{ts,js}')],
+  migrations: [join(__dirname, 'src/migrations/*.{ts,js}')],
+  synchronize: false,
+  logging: environment.DATABASE_LOGGING === 'true',
+});
 
-export default new DataSource(config);
+export default appDataSource;

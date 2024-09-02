@@ -7,6 +7,7 @@ import { UserProxy } from "../models/user.proxy";
 import * as bcryptjs from "bcryptjs";
 import { RolesEnum } from "../../../common/enums/roles.enum";
 import { getCleanedString } from "../../../utils/utils/functions";
+import { Roles } from "../../../decorators/roles/roles.decorator";
 
 @Injectable()
 export class UserService {
@@ -78,15 +79,10 @@ export class UserService {
     user.email = payload.email;
     user.city = payload.city;
 
-    switch (payload.roles) {
-      case RolesEnum.ADMIN:
-        user.roles = RolesEnum.ADMIN;
-        break;
-      case RolesEnum.NONE:
-        user.roles = RolesEnum.NONE
-        break;
-      default:
-        user.roles = RolesEnum.USER;
+    if (payload.roles.includes(RolesEnum.NONE)) {
+      user.roles = [RolesEnum.NONE];
+    } else {
+      user.roles = !payload.roles ? [RolesEnum.USER] : [RolesEnum.ADMIN];
     }
 
     user.password = await bcryptjs.hash(payload.password, passwordSalt);

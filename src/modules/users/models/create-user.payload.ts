@@ -37,7 +37,7 @@ export class CreateUserPayload {
   @MaxLength(255, { message: 'A senha não pode ter mais que 55 caracteres.' })
   public password!: string;
 
-  @ApiProperty({ default: RolesEnum.USER })
+  @ApiProperty({ default: [RolesEnum.USER] })
   @IsOptional()
-  public roles: RolesEnum;
+  public roles: RolesEnum[];
 }
