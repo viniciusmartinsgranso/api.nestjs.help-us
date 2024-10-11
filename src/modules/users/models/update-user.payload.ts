@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 import { DefaultValidationMessages } from 'src/common/validations/default-validation-messages';
+import { RolesEnum } from "../../../common/enums/roles.enum";
 
 export class UpdateUserPayload {
   @ApiPropertyOptional()
@@ -24,7 +25,9 @@ export class UpdateUserPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString({ message: DefaultValidationMessages.IsString })
-  @MinLength(6, { message: 'A senha precisa ter no mínimo 6 caracteres.' })
-  @MaxLength(55, { message: 'A senha não pode ter mais que 55 caracteres.' })
-  public password?: string;
+  public photoUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  public roles?: RolesEnum[];
 }

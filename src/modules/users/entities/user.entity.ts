@@ -37,6 +37,9 @@ export class UserEntity {
   @Column({ nullable: false, type: 'simple-array' })
   public roles!: RolesEnum[];
 
+  @Column({ nullable: true, unique: true })
+  public photoUrl: string;
+
   @OneToMany(() => OccurrenceEntity, (occurrence) => occurrence.user)
   occurrences: OccurrenceEntity[];
 }

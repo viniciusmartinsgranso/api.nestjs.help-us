@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { UserEntity } from "../entities/user.entity";
 import { Like, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -8,6 +8,7 @@ import * as bcryptjs from "bcryptjs";
 import { RolesEnum } from "../../../common/enums/roles.enum";
 import { getCleanedString } from "../../../utils/utils/functions";
 import { Roles } from "../../../decorators/roles/roles.decorator";
+import { UpdateUserPayload } from "../models/update-user.payload";
 
 @Injectable()
 export class UserService {
@@ -79,7 +80,7 @@ export class UserService {
     user.email = payload.email;
     user.city = payload.city;
 
-    if (payload.roles.includes(RolesEnum.NONE)) {
+    if (payload.roles && payload.roles.includes(RolesEnum.NONE)) {
       user.roles = [RolesEnum.NONE];
     } else {
       user.roles = !payload.roles ? [RolesEnum.USER] : [RolesEnum.ADMIN];
@@ -130,4 +131,26 @@ export class UserService {
 
     return this.repository.remove(entity);
   }
+
+  public async update(
+    id: number,
+    payload: UpdateUserPayload,
+    request: UserEntity,
+  ): Promise<UserEntity> {
+    if (request.roles.includes(RolesEnum.NONE))
+      throw new BadRequestException('Usuário não possui permissão.')
+
+    const entity = await this.getUserById(id);
+
+    if (!entity)
+      throw new NotFoundException('Usuário não foi encontrado.');
+
+    if (payload.name) entity.name = payload.name;
+    if (payload.email) entity.email = payload.email;
+    if (payload.city) entity.city = payload.city;
+    if (payload.roles) entity.roles = payload.roles;
+
+    return await this.repository.save(entity);
+  }
+
 }
