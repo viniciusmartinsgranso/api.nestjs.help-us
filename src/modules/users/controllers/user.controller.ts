@@ -6,28 +6,29 @@ import {
   Query,
   Param,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import {
   ApiBody,
   ApiOkResponse,
-  ApiOperation,
+  ApiOperation, ApiParam,
   ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+  ApiTags
+} from "@nestjs/swagger";
 import { UserProxy } from '../models/user.proxy';
 import { ProtectTo } from '../../../decorators/protect/protect.decorator';
 import { CreateUserPayload } from '../models/create-user.payload';
 import { User } from '../../../decorators/user/user.decorator';
 import { UserEntity } from '../entities/user.entity';
 import { RolesEnum } from '../../../common/enums/roles.enum';
+import { UpdateUserPayload } from '../models/update-user.payload';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ProtectTo()
   @Get()
   @ApiOperation({ summary: 'Obtém os dados de todos os usuários' })
   @ApiOkResponse({ type: UserProxy, isArray: true })
@@ -73,6 +74,23 @@ export class UserController {
   @ApiOkResponse({ type: UserProxy })
   public async getUserById(@Param('id') id: number): Promise<UserProxy> {
     return this.userService.getUserById(id);
+  }
+
+  @ProtectTo()
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza os dados de um usuário' })
+  @ApiOkResponse({ type: UserProxy })
+  @ApiBody({
+    type: UpdateUserPayload,
+  })
+  public async update(
+    @Param('id') id: number,
+    @Body() payload: UpdateUserPayload,
+    @User() requestUser: UserEntity,
+  ): Promise<UserProxy> {
+    return this.userService
+      .update(id, payload, requestUser)
+      .then((u) => new UserProxy(u));
   }
 
   @ProtectTo()

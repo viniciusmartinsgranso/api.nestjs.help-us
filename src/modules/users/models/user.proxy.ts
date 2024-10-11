@@ -43,6 +43,9 @@ export class UserProxy {
   @ApiProperty()
   public roles: RolesEnum[];
 
+  @ApiProperty()
+  public photoUrl: string;
+
   @ApiPropertyOptional({ isArray: true })
   public occurrences?: OccurrenceProxy[];
 }
