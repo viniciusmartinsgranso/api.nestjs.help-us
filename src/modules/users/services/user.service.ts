@@ -149,6 +149,7 @@ export class UserService {
     if (payload.email) entity.email = payload.email;
     if (payload.city) entity.city = payload.city;
     if (payload.roles) entity.roles = payload.roles;
+    if (payload.photoUrl) entity.photoUrl = payload.photoUrl;
 
     return await this.repository.save(entity);
   }
