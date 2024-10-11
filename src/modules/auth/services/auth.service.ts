@@ -52,7 +52,7 @@ export class AuthService {
 
   public async generateInvitedToken(): Promise<TokenProxy> {
     const payload: JwtPayload = {
-      id: 1,
+      id: 5,
     };
 
     const token = await this.jwtService.signAsync(payload, { expiresIn: '1d' });
