@@ -39,7 +39,7 @@ export class OccurrencesService {
     longitude: number,
     search?: string,
   ): Promise<OccurrenceEntity[]> {
-    const radius = 50 * 1000; // 12 km in meters
+    const radius = 12 * 1000; // 12 km in meters
 
     const occurrences = await this.repository.find({
       where: {
