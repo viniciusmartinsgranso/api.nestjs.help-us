@@ -7,8 +7,8 @@ import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../models/jwt.payload';
 import { TokenProxy } from '../models/token.proxy';
-import { UserService } from "../../users/services/user.service";
-import { UserEntity } from "../../users/entities/user.entity";
+import { UserService } from '../../users/services/user.service';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {

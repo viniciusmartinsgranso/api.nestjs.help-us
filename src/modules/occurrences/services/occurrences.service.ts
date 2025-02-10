@@ -1,17 +1,25 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { CreateOccurrencePayload } from "../models/create-occurrence.payload";
-import { UpdateOccurrencePayload } from "../models/update-occurrence.payload";
-import { InjectRepository } from "@nestjs/typeorm";
-import { OccurrenceEntity } from "../entities/occurrence.entity";
-import { Like, Repository } from "typeorm";
-import { UserEntity } from "../../users/entities/user.entity";
-import { RolesEnum } from "../../../common/enums/roles.enum";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateOccurrencePayload } from '../models/create-occurrence.payload';
+import { UpdateOccurrencePayload } from '../models/update-occurrence.payload';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OccurrenceEntity } from '../entities/occurrence.entity';
+import { Like, Repository } from 'typeorm';
+import { UserEntity } from '../../users/entities/user.entity';
+import { RolesEnum } from '../../../common/enums/roles.enum';
+import { NotificationService } from '../../notification/service/notification.service';
 
 @Injectable()
 export class OccurrencesService {
   constructor(
     @InjectRepository(OccurrenceEntity)
     private readonly repository: Repository<OccurrenceEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public getRepository(): Repository<OccurrenceEntity> {
@@ -23,12 +31,32 @@ export class OccurrencesService {
     createOccurrenceDto: CreateOccurrencePayload,
   ): Promise<OccurrenceEntity> {
     if (requestUser.roles.includes(RolesEnum.NONE))
-      throw new ForbiddenException("Usuário não possui permissão para criar uma ocorrência.");
+      throw new ForbiddenException(
+        'Usuário não possui permissão para criar uma ocorrência.',
+      );
 
     const occurrence = this.repository.create({
       ...createOccurrenceDto,
       userId: requestUser.id,
+      user: requestUser,
     });
+
+    const user = await this.userRepository.findOne({
+      where: { id: requestUser.id },
+      relations: ['residences'],
+    });
+
+    for (const residence of user.residences) {
+      const distance = this.calculateDistance(
+        residence.latitude,
+        residence.longitude,
+        occurrence.latitude,
+        occurrence.longitude,
+      );
+
+      if (distance <= 2)
+        await this.notificationService.notifyUser(user, occurrence, residence);
+    }
 
     return await this.repository.save(occurrence);
   }
@@ -39,13 +67,11 @@ export class OccurrencesService {
     longitude: number,
     search?: string,
   ): Promise<OccurrenceEntity[]> {
-    const radius = 50 * 1000; // 12 km in meters
+    const radius = 12 * 1000; // 12 km in meters
 
     const occurrences = await this.repository.find({
       where: {
-        ...(search && {
-          title: Like(`%${search}%`)
-        }),
+        ...(search && { title: Like(`%${search}%`) }),
         isActive: true,
       },
       order: {
@@ -109,17 +135,17 @@ export class OccurrencesService {
   //#region Private Methods
 
   private calculateDistance(
-    latitude1: number,
-    longitude1: number,
-    latitude2: number,
-    longitude2: number,
+    userLat: number,
+    userLong: number,
+    occurrenceLat: number,
+    occurrenceLog: number,
   ): number {
     const toRadians = (degrees: number) => degrees * (Math.PI / 180);
     const earthRadius = 6371e3;
-    const phi1 = toRadians(latitude1);
-    const phi2 = toRadians(latitude2);
-    const deltaPhi = toRadians(latitude2 - latitude1);
-    const deltaLambda = toRadians(longitude2 - longitude1);
+    const phi1 = toRadians(occurrenceLat);
+    const phi2 = toRadians(userLat);
+    const deltaPhi = toRadians(userLat - occurrenceLat);
+    const deltaLambda = toRadians(userLong - occurrenceLog);
 
     const a =
       Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +

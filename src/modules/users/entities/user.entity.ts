@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { RolesEnum } from '../../../common/enums/roles.enum';
 import { OccurrenceEntity } from "../../occurrences/entities/occurrence.entity";
+import { ResidenceEntity } from '../../residences/entities/residence.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -37,9 +38,15 @@ export class UserEntity {
   @Column({ nullable: false, type: 'simple-array' })
   public roles!: RolesEnum[];
 
+  @Column({ nullable: false })
+  public firebaseToken: string;
+
   @Column({ nullable: true, unique: true })
   public photoUrl: string;
 
   @OneToMany(() => OccurrenceEntity, (occurrence) => occurrence.user)
-  occurrences: OccurrenceEntity[];
+  public occurrences: OccurrenceEntity[];
+
+  @OneToMany(() => ResidenceEntity, (residence) => residence.user)
+  public residences: ResidenceEntity[];
 }

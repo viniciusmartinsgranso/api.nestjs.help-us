@@ -1,8 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserEntity } from '../entities/user.entity';
 import { GetManyDefaultResponseProxy } from '../../../common/proxies/get-many-default-response.proxy';
 import { RolesEnum } from '../../../common/enums/roles.enum';
-import { OccurrenceProxy } from "../../occurrences/models/occurrence.proxy";
+import { OccurrenceProxy } from '../../occurrences/models/occurrence.proxy';
 
 export class UserProxy {
   constructor(entity: UserEntity) {
@@ -14,6 +14,7 @@ export class UserProxy {
     this.email = entity.email;
     this.city = entity.city;
     this.roles = entity.roles;
+    this.firebaseToken = entity.firebaseToken;
   }
 
   @ApiProperty({ type: Number })
@@ -39,6 +40,9 @@ export class UserProxy {
 
   @ApiProperty({ type: String })
   public password!: string;
+
+  @ApiProperty({ type: String })
+  public firebaseToken!: string;
 
   @ApiProperty()
   public roles: RolesEnum[];

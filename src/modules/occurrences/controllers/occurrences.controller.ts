@@ -54,6 +54,8 @@ export class OccurrencesController {
     @Query('latitude') latitude: number,
     @Query('longitude') longitude: number,
     @Query('search') search: string,
+    @Query('startDate') search: Date,
+    @Query('endDate') search: Date,
   ): Promise<OccurrenceProxy[]> {
     return this.occurrencesService
       .findAll(requestUser, latitude, longitude, search)

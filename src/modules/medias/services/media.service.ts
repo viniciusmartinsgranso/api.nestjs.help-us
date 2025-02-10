@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { environment } from '../../../environment/environment';
 import * as AWS from '@aws-sdk/client-s3';
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class MediaService {
