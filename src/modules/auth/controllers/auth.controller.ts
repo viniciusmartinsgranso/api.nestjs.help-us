@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBody,
@@ -33,7 +33,7 @@ export class AuthController {
     return await this.service.generateInvitedToken();
   }
 
-  @Post('google')
+  @Get('google')
   @ApiOperation({
     summary:
       'Retorna a URL de autorização Google (front redireciona o usuário para lá)',
