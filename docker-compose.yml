@@ -1,7 +1,8 @@
 version: "3.8"
 services:
   db:
-    image: postgres
+    # Postgres 18+ mudou layout de volume; `postgres` (latest) falha com dados antigos em ./postgres
+    image: postgres:16
     container_name: postgres-help-us
     ports:
       - "5432:5432"
